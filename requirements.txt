@@ -1,0 +1,11 @@
+torch
+torchvision
+timm
+einops
+opencv-python-headless
+pillow
+scikit-learn
+seaborn
+matplotlib
+gradio
+optuna
