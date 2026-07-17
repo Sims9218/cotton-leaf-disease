@@ -3,6 +3,7 @@ import torch
 from PIL import Image
 import torchvision.transforms as transforms
 import os
+import urllib.request
 
 from src.model import RobustAttentionGuidedEdgeViT
 
@@ -12,19 +13,32 @@ st.write("Upload an image of a cotton leaf to extract its visual edges and run s
 
 @st.cache_resource
 def load_model():
-    model = RobustAttentionGuidedEdgeViT(num_classes=7, edge_mode='sobel', pretrained=False)
-    
     model_path = "best_hybrid_vit_model.pth"
+    
+    model_url = "https://github.com/Sims9218/cotton-leaf-disease/releases/download/v1.0/best_hybrid_vit_model.pth"
+    
+    if not os.path.exists(model_path):
+        with st.spinner("Downloading model weights from GitHub Releases... This might take a minute."):
+            try:
+                urllib.request.urlretrieve(model_url, model_path)
+                st.success("Model weights downloaded successfully!")
+            except Exception as e:
+                st.error(f"Failed to download the model weights. Check your GitHub Release URL. Error: {e}")
+                return None
+
+    model = RobustAttentionGuidedEdgeViT(num_classes=7, edge_mode='sobel', pretrained=False)
     
     if os.path.exists(model_path):
         model.load_state_dict(torch.load(model_path, map_location="cpu"))
+        model.eval()
+        return model
     else:
-        st.warning(f"Model weights not found at `{model_path}`. Please run the training script first to generate this file.")
-        
-    model.eval()
-    return model
+        return None
 
 model = load_model()
+
+if model is None:
+    st.stop()
 
 uploaded_file = st.file_uploader("Choose a cotton leaf image...", type=["jpg", "jpeg", "png"])
 
