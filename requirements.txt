@@ -1,11 +1,13 @@
-torch
+torch>=2.0.0
 torchvision
 timm
 einops
+numpy
 opencv-python-headless
 pillow
 scikit-learn
 seaborn
 matplotlib
-gradio
 optuna
+streamlit
+kagglehub
